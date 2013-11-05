@@ -14,3 +14,9 @@ C:\Users\Eminent\Documents\Projects\CMS\CMS\CMS\obj\Debug\CMS.dll
 C:\Users\Eminent\Documents\Projects\CMS\CMS\CMS\obj\Debug\CMS.pdb
 C:\Users\Eminent\Documents\Projects\CMS\CMS\CMS\bin\Oracle.DataAccess.dll
 C:\Users\Eminent\Documents\Projects\CMS\CMS\CMS\obj\Debug\CMS.csprojResolveAssemblyReference.cache
+C:\Users\Eminent\Documents\Projects\perception\CMS\CMS\CMS\obj\Debug\CMS.csprojResolveAssemblyReference.cache
+C:\Users\Eminent\Documents\Projects\perception\CMS\CMS\CMS\obj\Debug\CMS.dll
+C:\Users\Eminent\Documents\Projects\perception\CMS\CMS\CMS\bin\CMS.dll
+C:\Users\Eminent\Documents\Projects\perception\CMS\CMS\CMS\bin\CMS.pdb
+C:\Users\Eminent\Documents\Projects\perception\CMS\CMS\CMS\bin\Oracle.DataAccess.dll
+C:\Users\Eminent\Documents\Projects\perception\CMS\CMS\CMS\obj\Debug\CMS.pdb
