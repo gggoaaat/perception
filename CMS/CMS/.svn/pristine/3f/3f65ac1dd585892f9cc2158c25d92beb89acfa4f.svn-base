@@ -36,11 +36,11 @@
   </appSettings>
 
   <connectionStrings>
-    <add name="EP_OracleRootConn" connectionString="Data Source=XE;User Id=system; Password=ChangeYourPassWord;" />
-    <add name="EP_OracleUserConn" connectionString="Data Source=XE;User ID=PerceptionDB;Password=ChangeYourPassWord;" />
-    <add name="EP_MSSQLRootConn" connectionString="Server=EMINENT-PC\SQLEXPRESS;User Id=emin;Password=ChangeYourPassWord; "/>
-    <add name="EP_MSSQLRootConntoDB" connectionString="Server=EMINENT-PC\SQLEXPRESS;User Id=emin;Password=ChangeYourPassWord; Database=PerceptionDB;"/>
-    <add name="EP_MSSQLUserConn" connectionString="Server=EMINENT-PC\SQLEXPRESS;User Id=PerceptionDB;Password=ChangeYourPassWord; Database=PerceptionDB;"/>
+    <add name="EP_OracleRootConn" connectionString="Data Source=XE;User Id=system; Password=ChangePassword; " />
+    <add name="EP_OracleUserConn" connectionString="Data Source=XE;User ID=PerceptionDB;Password=ChangePassword;" />
+    <add name="EP_MSSQLRootConn" connectionString="Server=EMINENT-PC\SQLEXPRESS;User Id=emin;Password=ChangePassword; "/>
+    <add name="EP_MSSQLRootConntoDB" connectionString="Server=EMINENT-PC\SQLEXPRESS;User Id=emin;Password=ChangePassword; Database=PerceptionDB;"/>
+    <add name="EP_MSSQLUserConn" connectionString="Server=EMINENT-PC\SQLEXPRESS;User Id=PerceptionDB;Password=ChangePassword; Database=PerceptionDB;"/>
   </connectionStrings>
 
 
