@@ -20,12 +20,12 @@
 					</form>
 					<!-- END RESPONSIVE QUICK SEARCH FORM -->
 				</li>
-				<li class="start ">
+				<!--<li class="start ">
 					<a href="index.aspx">
 					<i class="icon-home"></i> 
 					<span class="title">Dashboard</span>
 					</a>
-				</li>
+				</li>-->
 
                 <li class="has-sub">
 					<a href="javascript:;">
@@ -50,7 +50,7 @@
 						
 					</ul>
 				</li>
-                  <li class="has-sub ">
+                  <!--<li class="has-sub ">
 					<a href="javascript:;">
 					<i class="icon-wrench"></i> 
 					<span class="title">Flows</span>
@@ -61,7 +61,7 @@
 						<li ><a href="newflow.aspx">New Flow</a></li>
 						
 					</ul>
-				</li>
+				</li>-->
 				<li class="has-sub ">
 					<a href="javascript:;">
 					<i class="icon-table"></i> 
@@ -74,7 +74,7 @@
                         <li ><a href="Form2Document.aspx">Form2Document</a></li>
 					</ul>
 				</li>
-                <li class="has-sub ">
+                <!--<li class="has-sub ">
 					<a href="javascript:;">
 					<i class="icon-briefcase"></i> 
 					<span class="title">Cases</span>
@@ -84,7 +84,7 @@
 						<li ><a href="cases.aspx">All Cases</a></li>
 						<li ><a href="newcase.aspx">New Case</a></li>
 					</ul>
-				</li>
+				</li>-->
               
                 <li class="has-sub ">
 					<a href="javascript:;">
@@ -99,7 +99,7 @@
 					</ul>
 				</li>
 
-				<li class="has-sub ">
+				<!--<li class="has-sub ">
 					<a href="javascript:;">
 					<i class="icon-th-list"></i> 
 					<span class="title">Pages</span>
@@ -110,10 +110,10 @@
                         <li ><a href="newtasks.aspx">New Task</a></li>
 						
 					</ul>
-				</li>
+				</li>-->
 
                 
-                 <li class="has-sub ">
+              <!--   <li class="has-sub ">
 					<a href="javascript:;">
 					<i class="icon-calendar"></i> 
 					<span class="title">Calendars</span>
@@ -124,7 +124,7 @@
 						<li ><a href="calendar.aspx">New Calendar</a></li>
 						
 					</ul>
-				</li>
+				</li>-->
 				
 				
 			</ul>

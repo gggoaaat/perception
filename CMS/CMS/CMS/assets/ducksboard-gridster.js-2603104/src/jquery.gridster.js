@@ -833,7 +833,7 @@
         this.$el = $(el);
         this.$wrapper = this.$el.parent();
         this.$widgets = this.$el.children(
-            this.options.widget_selector).addClass('gs-w');
+            this.options.widget_selector).addClass('gs-w unselected');
         this.widgets = [];
         this.$changed = $([]);
         this.wrapper_width = this.$wrapper.width();
@@ -952,7 +952,7 @@
             'data-row': pos.row,
             'data-sizex': size_x,
             'data-sizey': size_y
-        }).addClass('gs-w').appendTo(this.$el).hide();
+        }).addClass('gs-w unselected').appendTo(this.$el).hide();
 
         this.$widgets = this.$widgets.add($w);
 

@@ -18,7 +18,7 @@
 				<!-- BEGIN TOP NAVIGATION MENU -->					
 				<ul class="nav pull-right">
 					<!-- BEGIN NOTIFICATION DROPDOWN -->	
-					<li class="dropdown" id="header_notification_bar">
+					<!--<li class="dropdown" id="header_notification_bar">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 						<i class="icon-warning-sign"></i>
 						<span class="badge">6</span>
@@ -73,10 +73,10 @@
 								<a href="#">See all notifications <i class="m-icon-swapright"></i></a>
 							</li>
 						</ul>
-					</li>
+					</li>-->
 					<!-- END NOTIFICATION DROPDOWN -->
 					<!-- BEGIN INBOX DROPDOWN -->
-					<li class="dropdown" id="header_inbox_bar">
+				<!--<li class="dropdown" id="header_inbox_bar">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 						<i class="icon-envelope-alt"></i>
 						<span class="badge">5</span>
@@ -128,10 +128,10 @@
 								<a href="#">See all messages <i class="m-icon-swapright"></i></a>
 							</li>
 						</ul>
-					</li>
+					</li>-->
 					<!-- END INBOX DROPDOWN -->
 					<!-- BEGIN TODO DROPDOWN -->
-					<li class="dropdown" id="header_task_bar">
+					<!--<li class="dropdown" id="header_task_bar">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 						<i class="icon-tasks"></i>
 						<span class="badge">5</span>
@@ -210,7 +210,7 @@
 								<a href="#">See all tasks <i class="m-icon-swapright"></i></a>
 							</li>
 						</ul>
-					</li>
+					</li>-->
 					<!-- END TODO DROPDOWN -->
 					<!-- BEGIN USER LOGIN DROPDOWN -->
 					<li class="dropdown user">
@@ -221,9 +221,9 @@
 						</a>
 						<ul class="dropdown-menu">
 							<li><a href="extra_profile.html"><i class="icon-user"></i> My Profile</a></li>
-							<li><a href="calendar.html"><i class="icon-calendar"></i> My Calendar</a></li>
+						<!--	<li><a href="calendar.html"><i class="icon-calendar"></i> My Calendar</a></li>
 							<li><a href="#"><i class="icon-tasks"></i> My Tasks</a></li>
-							<li class="divider"></li>
+							<li class="divider"></li>-->
 							<li><a href="login.html"><i class="icon-key"></i> Log Out</a></li>
 						</ul>
 					</li>
