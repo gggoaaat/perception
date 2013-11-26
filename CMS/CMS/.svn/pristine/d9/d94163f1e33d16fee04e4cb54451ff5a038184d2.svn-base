@@ -200,9 +200,8 @@
 
                             function saveGrid() {
                                 SaveWidgetsFromGrid();
-                               // CMS.ws.EP_WebService.SaveGrid(gridwidgets, SucceededCallback, OnError);
+                                CMS.ws.EP_WebService.SaveGrid(gridwidgets, SucceededCallback, OnError);
                                 CMS.ws.EP_WebService.SaveGrid("Oracle", "", "Sample Grid", gridwidgets, SucceededCallback, OnError);
-                                
                             }
 
                             function SucceededCallback(result, eventArgs) {

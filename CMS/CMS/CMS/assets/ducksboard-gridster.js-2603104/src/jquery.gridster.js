@@ -833,7 +833,7 @@
         this.$el = $(el);
         this.$wrapper = this.$el.parent();
         this.$widgets = this.$el.children(
-            this.options.widget_selector).addClass('gs-w unselected');
+            this.options.widget_selector).addClass('gs-w');
         this.widgets = [];
         this.$changed = $([]);
         this.wrapper_width = this.$wrapper.width();

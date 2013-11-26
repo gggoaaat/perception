@@ -117,7 +117,7 @@
                                     <!--Makes Web Service available for the Client Script -->                                  
                                     <asp:ScriptManager ID="ScriptManager1" runat="server">  
                                         <Services>  
-                                            <asp:ServiceReference Path="ws\EP-WebService.asmx" />  
+                                            <asp:ServiceReference Path="ws\test.asmx" />  
                                         </Services>  
                                     </asp:ScriptManager> 
                                                         
@@ -200,9 +200,8 @@
 
                             function saveGrid() {
                                 SaveWidgetsFromGrid();
-                               // CMS.ws.EP_WebService.SaveGrid(gridwidgets, SucceededCallback, OnError);
-                                CMS.ws.EP_WebService.SaveGrid("Oracle", "", "Sample Grid", gridwidgets, SucceededCallback, OnError);
-                                
+                                CMS.ws.test.SaveGrid(gridwidgets, SucceededCallback, OnError);
+                                CMS.ws.test.SaveGrid("Oracle", "", "Test Griddy", gridwidgets, SucceededCallback, OnError);
                             }
 
                             function SucceededCallback(result, eventArgs) {
@@ -228,6 +227,7 @@
                                         lis[i].getAttribute('class'));
             
                             }
+
 
                             $('#saveform').live('click', function () {
                                 jQuery('li.gs-w').removeClass('selected');
