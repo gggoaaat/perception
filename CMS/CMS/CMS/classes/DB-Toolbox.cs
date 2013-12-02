@@ -3915,7 +3915,7 @@ namespace CMS.classes
 
                     foreach (ColumnStructure i in ColumnList)
                     {
-                        HoldResult.Add(EP_ADD_COLUMN(DB_PLATFORM, connAuth, TableName, i._Name, i._DataType, i._DefaultValue, i._IsNull));
+                        HoldResult.Add(EP_ADD_COLUMN(DB_PLATFORM, connAuth, TableName, i._Name, EP_GET_DATATYPE(DB_Platform, i._DataType), i._DefaultValue, i._IsNull));
                     }
                     break;
                 case "Microsoft":
@@ -5952,6 +5952,51 @@ namespace CMS.classes
         public string CreateFilePath(string path1)
         {
             return path1.Replace(@"\",@"\\");
+        }
+
+        //START TOOL UNIVERSAL 
+        //
+        public string EP_GET_DATATYPE(string DB_Platform, string column )
+        {
+            string tempColumn = column;
+
+            switch(DB_Platform)
+            {
+                case "Oracle":
+                case "ORACLE":
+
+                    switch (tempColumn)
+                    {
+                        case "Characters":
+                            break;
+                        case "Numbers":
+                            break;
+                        case "Dates":
+                            break;
+                        case "Times":
+                            break;
+                    }
+
+                    return column;
+                case "Microsoft":
+                case "MICROSOFT":
+
+                    switch (tempColumn)
+                    {
+                        case "Characters":
+                            break;
+                        case "Numbers":
+                            break;
+                        case "Dates":
+                            break;
+                        case "Times":
+                            break;
+                    }
+
+                    return column;
+                default:
+                    return "Invalid DB Platform";
+            }
         }
     }
 }
