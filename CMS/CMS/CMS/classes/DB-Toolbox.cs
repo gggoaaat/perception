@@ -186,13 +186,15 @@ namespace CMS.classes
 
                     Logger.AddRange(EP_BUILD_CORE_STRUCTURE(DB_PLATFORM, connRoot, connAuth, connAuth, SystemName, Password));
 
+                    Logger.AddRange(EP_BUILD_DICTIONARY(DB_PLATFORM, connAuth, SystemName));
+
+                    Logger.AddRange(EP_LOAD_SYS_DATA(DB_PLATFORM, connAuth, SystemName));
+
                     Logger.AddRange(EP_BUILD_SYSTEM_STRUCTURE(DB_PLATFORM, connAuth, SystemName));
 
                     Logger.AddRange(EP_BUILD_SYSTEM_VIEWS(DB_PLATFORM, connAuth, SystemName));
 
-                    Logger.AddRange(SQL_DATA_DEFAULT(DB_PLATFORM, connAuth, SystemName));
-
-                    Logger.AddRange(SQL_DATA_EXAMPLE(DB_PLATFORM, connAuth, SystemName));
+                    //Logger.AddRange(EP_LOAD_TEST_DATA(DB_PLATFORM, connAuth, SystemName));
                 break;
                 
                 case "Microsoft":
@@ -201,11 +203,13 @@ namespace CMS.classes
                     
                     Logger.AddRange(EP_BUILD_CORE_STRUCTURE(DB_PLATFORM, connRoot, connAuth, connOwner, SystemName, Password));
 
+                    Logger.AddRange(EP_BUILD_DICTIONARY(DB_PLATFORM, connOwner, SystemName));
+
+                    Logger.AddRange(EP_LOAD_SYS_DATA(DB_PLATFORM, connOwner, SystemName));
+
                     Logger.AddRange(EP_BUILD_SYSTEM_STRUCTURE(DB_PLATFORM, connOwner, SystemName));
 
-                    Logger.AddRange(SQL_DATA_DEFAULT(DB_PLATFORM, connOwner, SystemName));
-
-                    Logger.AddRange(SQL_DATA_EXAMPLE(DB_PLATFORM, connOwner, SystemName));
+                    //Logger.AddRange(EP_LOAD_TEST_DATA(DB_PLATFORM, connOwner, SystemName));
                 break;
 
             }
@@ -283,1132 +287,532 @@ namespace CMS.classes
             List<ColumnStructure> ExistingColumnsList = new List<ColumnStructure>();
             List<ColumnStructure> MetaColumnsList = new List<ColumnStructure>();
 
-            switch (DB_PLATFORM)
-            {
-                case "Oracle":
-                case "ORACLE":
-                    //---CREATE - OBJECT Layer--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_LAYER", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "OBJECT_LAYERS", ScaffoldColumns));
-
-                    //---PK - OBJECT LAYERS Unique KEY--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_LAYER", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_PRIMARY_KEY(DB_PLATFORM, connAuth, "OBJECT_LAYERS_1", "OBJECT_LAYERS", ExistingColumnsList));
-
-                    //---CREATE - OBJECTS--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_LAYER", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "OBJECTS", ScaffoldColumns));
-
-                    //---PK - OBJECTS Unique KEY--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_PRIMARY_KEY(DB_PLATFORM, connAuth, "OBJECTS_1", "OBJECTS", ExistingColumnsList));
-
-                    //---FK - OBJECT LAYERS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_LAYER", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJECTS_1", "OBJECTS", "OBJECT_LAYERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - LOGS--->
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "Entry", _DataType = "varchar2(4000)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "LOGS", ScaffoldColumns));
-
-                    //---FK - LOGS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "LOGS_1", "LOGS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - ORGANIZATIONS--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "Organizations", ScaffoldColumns));
-
-                    //---FK - ORGANIZATIONS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "ORGANIZATIONS_1", "ORGANIZATIONS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - Groups--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "GROUPS", ScaffoldColumns));
-
-                    //---FK - GROUPS FOREIGN KEYS 1--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GROUP_1", "GROUPS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - GROUPS FOREIGN KEY 2--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GROUPS_2", "GROUPS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-
-                    //---CREATE - USERS--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "USERS", ScaffoldColumns));
-
-
-
-                    //---FK - USERS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "USERS_1", "USERS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - GROUPS & USERS--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "GROUPS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "GROUPS_USERS", ScaffoldColumns));
-
-                    //---FK - GROUPS & USERS FOREIGN KEY 1--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GROUPS_USERS_1", "GROUPS_USERS", "Users", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - GROUPS & USERS FOREIGN KEY 2--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "GROUPS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GROUPS_USERS_2", "GROUPS_USERS", "GROUPS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - STAGES
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "STAGES", ScaffoldColumns));
-
-
-
-                    //---PK - STAGES Primary KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_PRIMARY_KEY(DB_PLATFORM, connAuth, "STAGES_1", "STAGES", ExistingColumnsList));
-
-                    //---FK - STAGES FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    MetaColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "STAGES_1", "STAGES", "OBJECTS", ExistingColumnsList, MetaColumnsList));
-
-                    //---FK - STAGES FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "STAGES_2", "STAGES", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - STAGES FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "STAGES_3", "STAGES", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - Grips
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "GRIP_NAME", _DataType = "varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "GRIPS", ScaffoldColumns));
-
-                    //---PK - GRIPS Primary KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "GRIP_NAME", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_PRIMARY_KEY(DB_PLATFORM, connAuth, "GRIPS_1", "GRIPS", ExistingColumnsList));
-
-                    //---FK - GRIPS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIPS_1", "GRIPS", "STAGES", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - GRIPS FOREIGN KEY 2--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIPS_2", "GRIPS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - GRIPS FOREIGN KEY 2--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIPS_3", "GRIPS", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-
-
-                    //---CREATE - OBJECTS SETS
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "GRIP_NAME", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "OBJECT_SETS", ScaffoldColumns));
-
-                    //---UK - OBJECTS SETS UNIQUE KEY 1---> 
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "GRIP_NAME", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_SETS_ID", _DataType = "Number", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_UNIQUE_KEY(DB_PLATFORM, connAuth, "OBJECT_SETS_1", "OBJECT_SETS", ExistingColumnsList));
-
-                    //---UK - OBJECTS SETS UNIQUE KEY 1---> 
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_SETS_ID", _DataType = "Number", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_UNIQUE_KEY(DB_PLATFORM, connAuth, "OBJECT_SETS_2", "OBJECT_SETS", ExistingColumnsList));
-
-
-                    //---FK - OBJECTS SETS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJECT_SETS_1", "OBJECT_SETS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - OBJECTS_SETS FOREIGN KEY 2--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJECT_SET_2", "OBJECT_SETS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - OBJECTS_SETS FOREIGN KEY 3--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJECT_SETS_3", "OBJECT_SETS", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - OBJECTS_SETS FOREIGN KEY 4--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "GRIP_NAME", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJECT_SETS_5", "OBJECT_SETS", "GRIPS", ExistingColumnsList, ExistingColumnsList));
-
-
-
-                    //---CREATE - OBJECT OPTION SETS
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_SETS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "Option_Value", _DataType = "varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "OBJ_OPT_SETS", ScaffoldColumns));
-
-                    //---FK OBJECT OPTION SETS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_SETS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJECT_OPT_SETS_1", "OBJ_OPT_SETS", "OBJECT_SETS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - Value Datatypes--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "VALUE_DATATYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "VALUE_DATATYPES", ScaffoldColumns));
-
-                    //---UK VALUE DATATYPES Unique KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "VALUE_DATATYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_UNIQUE_KEY(DB_PLATFORM, connAuth, "VALUE_DATATYPES_1", "VALUE_DATATYPES", ExistingColumnsList));
-
-                    //---CREATE - OBJECTS & PROPERTIES SETS--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_SETS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "VALUE_DATATYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "Property_Name", _DataType = "Varchar2(250)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "HAS_PARENT", _DataType = "Varchar2(5)", _DefaultValue = "true", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "HAS_CHILD", _DataType = "Varchar2(5)", _DefaultValue = "false", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "PARENT_OBJ_PROP_SETS_ID", _DataType = "number", _DefaultValue = "0", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "PROPERTY_VALUE", _DataType = "Varchar2(250)", _DefaultValue = "", _IsNull = true });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "OBJ_PROP_SETS", ScaffoldColumns));
-
-                    //---FK OBJECTS & PROPERTIES SETS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_SETS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJ_PROP_SETS_1", "OBJ_PROP_SETS", "OBJECT_SETS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK OBJECTS & PROPERTIES SETS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJ_PROP_SETS_2", "OBJ_PROP_SETS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK OBJECTS & PROPERTIES SETS FOREIGN KEY 2--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "VALUE_DATATYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJ_PROP_SETS_3", "OBJ_PROP_SETS", "VALUE_DATATYPES", ExistingColumnsList, ExistingColumnsList));
-
-
-                    //---CREATE - OBJECTS PROPERTIES OPTIONS SETS--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJ_PROP_SETS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "Option_Value", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "OBJ_PROP_OPT_SETS", ScaffoldColumns));
-
-                    //---FK OBJECTS PROPERTIES OPTIONS SETS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJ_PROP_SETS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJ_PROP_OPT_SETS_1", "OBJ_PROP_OPT_SETS", "OBJ_PROP_SETS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---UK - OBJECTS SETS UNIQUE KEY 1---> 
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJ_PROP_SETS_ID", _DataType = "Number", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "Option_Value", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_UNIQUE_KEY(DB_PLATFORM, connAuth, "OBJ_PROP_OPT_SETS_1", "OBJ_PROP_OPT_SETS", ExistingColumnsList));
-
-
-                    //---CREATE - CORES--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "CORES", ScaffoldColumns));
-
-
-
-                    //---FK - CORES FOREIGN KEY 1--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CORES_1", "CORES", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - CORES FOREIGN KEY 2--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CORES_2", "CORES", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - CORES FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CORES_3", "CORES", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-
-                    //---CREATE - APPLICATIONS--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "CORES_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "APPLICATIONS", ScaffoldColumns));
-
-
-
-                    //---PK - APPLICATIONS PRIMARY KEY--->
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "Name", _DataType = "varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_PRIMARY_KEY(DB_PLATFORM, connAuth, "APPLICATIONS", "APPLICATIONS", ScaffoldColumns));
-
-                    //---FK - APPLICATIONS FOREIGN KEY 1--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "CORES_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    MetaColumnsList.Add(new ColumnStructure { _Name = "CORES_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "APPLICATIONS_1", "APPLICATIONS", "CORES", MetaColumnsList, ExistingColumnsList));
-
-                    //---FK - APPLICATIONS FOREIGN KEY 2--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "APPLICATIONS_2", "APPLICATIONS", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - APPLICATIONS FOREIGN KEY 3--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "APPLICATIONS_3", "APPLICATIONS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - APPLICATIONS FOREIGN KEY 4--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "APPLICATIONS_4", "APPLICATIONS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - ROLES--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "ROLES", ScaffoldColumns));
-
-                    //---FK - ROLES FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "ROLES_1", "ROLES", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - PRIVELEGES--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "PRIVELEGES", ScaffoldColumns));
-
-                    //---FK - PRIVELEGES FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "PRIVELEGES_1", "PRIVELEGES", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - ROLES & PRIVELEGES--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ROLES_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "PRIVELEGES_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "ROLES_PRIVELEGES", ScaffoldColumns));
-
-                    //---FK - ROLES & PRIVELEGES FOREIGN KEY 1--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ROLES_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "ROLES_PRIVELEGES_1", "ROLES_PRIVELEGES", "ROLES", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - ROLES & PRIVELEGES FOREIGN KEY 2--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "PRIVELEGES_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "ROLES_PRIVELEGES_2", "ROLES_PRIVELEGES", "PRIVELEGES", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - USERS & ROLES & PRIVELEGES--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ROLES_PRIVELEGES_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "USERS_ROLES_PRIVELEGES", ScaffoldColumns));
-
-                    //---FK - USERS & ROLES & PRIVELEGES FOREIGN KEY 1--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ROLES_PRIVELEGES_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "USERS_ROLES_PRIVELEGES_1", "USERS_ROLES_PRIVELEGES", "ROLES_PRIVELEGES", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - USERS &  ROLES & PRIVELEGES FOREIGN KEY 2--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "USERS_ROLES_PRIVELEGES_2", "USERS_ROLES_PRIVELEGES", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-
-
-                    //---CREATE - CASES--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "APPLICATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "CASES", ScaffoldColumns));
-
-
-
-                    //---FK - CASES FOREIGN KEY 1--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "APPLICATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_1", "CASES", "APPLICATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - CASES FOREIGN KEY 2--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_2", "CASES", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - CASES FOREIGN KEY 3--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_3", "CASES", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - CASES FOREIGN KEY 4--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_4", "CASES", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-
-
-                    //---CREATE - FORMS--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "Organizations_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "FORMS", ScaffoldColumns));
-
-                    //---FK - FORMS FOREIGN KEY 1--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_1", "FORMS", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - FORMS FOREIGN KEY 2--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_2", "FORMS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - FORMS FOREIGN KEY 3--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_3", "FORMS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - CASES & FORMS--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "CASES_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "FORMS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "CASES_FORMS", ScaffoldColumns));
-
-                    //---FK - CASES & FORMS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "CASES_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_FORMS_1", "CASES_FORMS", "CASES", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - CASES & FORMS FOREIGN KEY 2--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "FORMS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_FORMS_2", "CASES_FORMS", "FORMS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - CASES & FORMS FOREIGN KEY 3--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_FORMS_3", "CASES_FORMS", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - CASES & FORMS FOREIGN KEY 4--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_FORMS_4", "CASES_FORMS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-
-                    //---CREATE - FORMS & STAGES--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "FORMS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "FORMS_STAGES", ScaffoldColumns));
-
-                    //---FK - FORMS & STAGES FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_STAGES_1", "FORMS_STAGES", "STAGES", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - FORMS & OBJECTS STAGES FOREIGN KEY 2--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "FORMS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_STAGES_2", "FORMS_STAGES", "FORMS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - FORMS & OBJECTS STAGES FOREIGN KEY 3--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_STAGES_3", "FORMS_STAGES", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - FORMS & OBJECTS STAGES FOREIGN KEY 4--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_STAGES_4", "FORMS_STAGES", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - GRIDS--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "Organizations_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "GRIDS", ScaffoldColumns));
-
-                    //---FK - GRIDS FOREIGN KEY 1--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIDS_1", "GRIDS", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - GRIDS FOREIGN KEY 2--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIDS_2", "GRIDS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - GRIDS FOREIGN KEY 3--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIDS_3", "GRIDS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - GRIDS & FORM & STAGES--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "GRIDS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "FORMS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "GRIDS_FORMS_STAGES", ScaffoldColumns));
-
-                    //---FK - GRIDS & FORMS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "FORMS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIDS_FORMS_STAGES_1", "GRIDS_FORMS_STAGES", "FORMS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - GRIDS & STAGES FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar2(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIDS_FORMS_STAGES_2", "GRIDS_FORMS_STAGES", "STAGES", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - GRIDS & FORMS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "GRIDS_ID", _DataType = "number", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIDS_FORMS_STAGES_3", "GRIDS_FORMS_STAGES", "GRIDS", ExistingColumnsList, ExistingColumnsList));
-
-
-                    Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "USERS"));
-                    Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "STAGES"));
-                    Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "GRIPS"));
-                    Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "CORES"));
-                    Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "APPLICATIONS"));
-                    Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "CASES"));
-                    Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "FORMS"));
-                    break;
-                case "Microsoft":
-                case "MICROSOFT":
-                    //---CREATE - OBJECT Layer--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_LAYER", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "OBJECT_LAYERS", ScaffoldColumns));
-
-                    //---PK - OBJECT LAYERS Unique KEY--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_LAYER", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_PRIMARY_KEY(DB_PLATFORM, connAuth, "OBJECT_LAYERS_1", "OBJECT_LAYERS", ExistingColumnsList));
-
-                    //---CREATE - OBJECTS--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_LAYER", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "OBJECTS", ScaffoldColumns));
-
-                    //---PK - OBJECTS Unique KEY--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_PRIMARY_KEY(DB_PLATFORM, connAuth, "OBJECTS_1", "OBJECTS", ExistingColumnsList));
-
-                    //---FK - OBJECT LAYERS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_LAYER", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJECTS_1", "OBJECTS", "OBJECT_LAYERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - LOGS--->
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "Entry", _DataType = "Varchar(4000)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "LOGS", ScaffoldColumns));
-
-                    //---FK - LOGS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "LOGS_1", "LOGS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - ORGANIZATIONS--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "Organizations", ScaffoldColumns));
-
-                    //---FK - ORGANIZATIONS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "ORGANIZATIONS_1", "ORGANIZATIONS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - Groups--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "GROUPS", ScaffoldColumns));
-
-                    //---FK - GROUPS FOREIGN KEYS 1--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GROUP_1", "GROUPS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - GROUPS FOREIGN KEY 2--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GROUPS_2", "GROUPS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-
-                    //---CREATE - USERS--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "USERS", ScaffoldColumns));
-
-
-
-                    //---FK - USERS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "USERS_1", "USERS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - GROUPS & USERS--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "GROUPS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "GROUPS_USERS", ScaffoldColumns));
-
-                    //---FK - GROUPS & USERS FOREIGN KEY 1--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GROUPS_USERS_1", "GROUPS_USERS", "Users", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - GROUPS & USERS FOREIGN KEY 2--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "GROUPS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GROUPS_USERS_2", "GROUPS_USERS", "GROUPS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - STAGES
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "STAGES", ScaffoldColumns));
-
-
-
-                    //---PK - STAGES Primary KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_PRIMARY_KEY(DB_PLATFORM, connAuth, "STAGES_1", "STAGES", ExistingColumnsList));
-
-                    //---FK - STAGES FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    MetaColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "STAGES_1", "STAGES", "OBJECTS", ExistingColumnsList, MetaColumnsList));
-
-                    //---FK - STAGES FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "STAGES_2", "STAGES", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - STAGES FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "STAGES_3", "STAGES", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - Grips
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "GRIP_NAME", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "GRIPS", ScaffoldColumns));
-
-                    //---PK - GRIPS Primary KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "GRIP_NAME", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_PRIMARY_KEY(DB_PLATFORM, connAuth, "GRIPS_1", "GRIPS", ExistingColumnsList));
-
-                    //---FK - GRIPS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIPS_1", "GRIPS", "STAGES", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - GRIPS FOREIGN KEY 2--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIPS_2", "GRIPS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - GRIPS FOREIGN KEY 2--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIPS_3", "GRIPS", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-
-
-                    //---CREATE - OBJECTS SETS
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "GRIP_NAME", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "OBJECT_SETS", ScaffoldColumns));
-
-                    //---UK - OBJECTS SETS UNIQUE KEY 1---> 
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "GRIP_NAME", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_SETS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_UNIQUE_KEY(DB_PLATFORM, connAuth, "OBJECT_SETS_1", "OBJECT_SETS", ExistingColumnsList));
-
-                    //---UK - OBJECTS SETS UNIQUE KEY 1---> 
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_SETS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_UNIQUE_KEY(DB_PLATFORM, connAuth, "OBJECT_SETS_2", "OBJECT_SETS", ExistingColumnsList));
-
-
-                    //---FK - OBJECTS SETS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJECT_SETS_1", "OBJECT_SETS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - OBJECTS_SETS FOREIGN KEY 2--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJECT_SET_2", "OBJECT_SETS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - OBJECTS_SETS FOREIGN KEY 3--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJECT_SETS_3", "OBJECT_SETS", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - OBJECTS_SETS FOREIGN KEY 4--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "GRIP_NAME", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJECT_SETS_5", "OBJECT_SETS", "GRIPS", ExistingColumnsList, ExistingColumnsList));
-
-
-
-                    //---CREATE - OBJECT OPTION SETS
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_SETS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "Option_Value", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "OBJ_OPT_SETS", ScaffoldColumns));
-
-                    //---FK OBJECT OPTION SETS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_SETS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJECT_OPT_SETS_1", "OBJ_OPT_SETS", "OBJECT_SETS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - Value Datatypes--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "VALUE_DATATYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "VALUE_DATATYPES", ScaffoldColumns));
-
-                    //---UK VALUE DATATYPES Unique KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "VALUE_DATATYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_UNIQUE_KEY(DB_PLATFORM, connAuth, "VALUE_DATATYPES_1", "VALUE_DATATYPES", ExistingColumnsList));
-
-                    //---CREATE - OBJECTS & PROPERTIES SETS--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_SETS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "VALUE_DATATYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "Property_Name", _DataType = "Varchar(250)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "HAS_PARENT", _DataType = "Varchar(5)", _DefaultValue = "true", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "HAS_CHILD", _DataType = "Varchar(5)", _DefaultValue = "false", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "PARENT_OBJ_PROP_SETS_ID", _DataType = "integer", _DefaultValue = "0", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "PROPERTY_VALUE", _DataType = "Varchar(250)", _DefaultValue = "", _IsNull = true });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "OBJ_PROP_SETS", ScaffoldColumns));
-
-                    //---FK OBJECTS & PROPERTIES SETS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_SETS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJ_PROP_SETS_1", "OBJ_PROP_SETS", "OBJECT_SETS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK OBJECTS & PROPERTIES SETS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJ_PROP_SETS_2", "OBJ_PROP_SETS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK OBJECTS & PROPERTIES SETS FOREIGN KEY 2--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "VALUE_DATATYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJ_PROP_SETS_3", "OBJ_PROP_SETS", "VALUE_DATATYPES", ExistingColumnsList, ExistingColumnsList));
-
-
-                    //---CREATE - OBJECTS PROPERTIES OPTIONS SETS--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJ_PROP_SETS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "Option_Value", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "OBJ_PROP_OPT_SETS", ScaffoldColumns));
-
-                    //---FK OBJECTS PROPERTIES OPTIONS SETS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJ_PROP_SETS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJ_PROP_OPT_SETS_1", "OBJ_PROP_OPT_SETS", "OBJ_PROP_SETS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---UK - OBJECTS SETS UNIQUE KEY 1---> 
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJ_PROP_SETS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "Option_Value", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_UNIQUE_KEY(DB_PLATFORM, connAuth, "OBJ_PROP_OPT_SETS_1", "OBJ_PROP_OPT_SETS", ExistingColumnsList));
-
-
-                    //---CREATE - CORES--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "CORES", ScaffoldColumns));
-
-
-
-                    //---FK - CORES FOREIGN KEY 1--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CORES_1", "CORES", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - CORES FOREIGN KEY 2--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CORES_2", "CORES", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - CORES FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CORES_3", "CORES", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-
-                    //---CREATE - APPLICATIONS--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "CORES_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "APPLICATIONS", ScaffoldColumns));
-
-
-
-                    //---PK - APPLICATIONS PRIMARY KEY--->
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "Name", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_PRIMARY_KEY(DB_PLATFORM, connAuth, "APPLICATIONS", "APPLICATIONS", ScaffoldColumns));
-
-                    //---FK - APPLICATIONS FOREIGN KEY 1--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "CORES_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    MetaColumnsList.Add(new ColumnStructure { _Name = "CORES_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "APPLICATIONS_1", "APPLICATIONS", "CORES", MetaColumnsList, ExistingColumnsList));
-
-                    //---FK - APPLICATIONS FOREIGN KEY 2--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "APPLICATIONS_2", "APPLICATIONS", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - APPLICATIONS FOREIGN KEY 3--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "APPLICATIONS_3", "APPLICATIONS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - APPLICATIONS FOREIGN KEY 4--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "APPLICATIONS_4", "APPLICATIONS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - ROLES--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "ROLES", ScaffoldColumns));
-
-                    //---FK - ROLES FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "ROLES_1", "ROLES", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - PRIVELEGES--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "PRIVELEGES", ScaffoldColumns));
-
-                    //---FK - PRIVELEGES FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "PRIVELEGES_1", "PRIVELEGES", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - ROLES & PRIVELEGES--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ROLES_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "PRIVELEGES_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "ROLES_PRIVELEGES", ScaffoldColumns));
-
-                    //---FK - ROLES & PRIVELEGES FOREIGN KEY 1--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ROLES_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "ROLES_PRIVELEGES_1", "ROLES_PRIVELEGES", "ROLES", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - ROLES & PRIVELEGES FOREIGN KEY 2--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "PRIVELEGES_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "ROLES_PRIVELEGES_2", "ROLES_PRIVELEGES", "PRIVELEGES", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - USERS & ROLES & PRIVELEGES--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ROLES_PRIVELEGES_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "USERS_ROLES_PRIVELEGES", ScaffoldColumns));
-
-                    //---FK - USERS & ROLES & PRIVELEGES FOREIGN KEY 1--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ROLES_PRIVELEGES_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "USERS_ROLES_PRIVELEGES_1", "USERS_ROLES_PRIVELEGES", "ROLES_PRIVELEGES", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - USERS &  ROLES & PRIVELEGES FOREIGN KEY 2--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "USERS_ROLES_PRIVELEGES_2", "USERS_ROLES_PRIVELEGES", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-
-
-                    //---CREATE - CASES--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "APPLICATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "CASES", ScaffoldColumns));
-
-
-
-                    //---FK - CASES FOREIGN KEY 1--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "APPLICATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_1", "CASES", "APPLICATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - CASES FOREIGN KEY 2--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_2", "CASES", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - CASES FOREIGN KEY 3--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_3", "CASES", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - CASES FOREIGN KEY 4--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_4", "CASES", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-
-
-                    //---CREATE - FORMS--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "Organizations_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "FORMS", ScaffoldColumns));
-
-                    //---FK - FORMS FOREIGN KEY 1--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_1", "FORMS", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - FORMS FOREIGN KEY 2--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_2", "FORMS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - FORMS FOREIGN KEY 3--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_3", "FORMS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - CASES & FORMS--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "CASES_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "FORMS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "CASES_FORMS", ScaffoldColumns));
-
-                    //---FK - CASES & FORMS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "CASES_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_FORMS_1", "CASES_FORMS", "CASES", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - CASES & FORMS FOREIGN KEY 2--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "FORMS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_FORMS_2", "CASES_FORMS", "FORMS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - CASES & FORMS FOREIGN KEY 3--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_FORMS_3", "CASES_FORMS", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - CASES & FORMS FOREIGN KEY 4--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_FORMS_4", "CASES_FORMS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-
-                    //---CREATE - FORMS & STAGES--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "FORMS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "FORMS_STAGES", ScaffoldColumns));
-
-                    //---FK - FORMS & STAGES FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_STAGES_1", "FORMS_STAGES", "STAGES", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - FORMS & OBJECTS STAGES FOREIGN KEY 2--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "FORMS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_STAGES_2", "FORMS_STAGES", "FORMS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - FORMS & OBJECTS STAGES FOREIGN KEY 3--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_STAGES_3", "FORMS_STAGES", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - FORMS & OBJECTS STAGES FOREIGN KEY 4--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_STAGES_4", "FORMS_STAGES", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
+
+            
+
+            //---CREATE - ORGANIZATIONS--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "Organizations", ScaffoldColumns));
+
+            //---FK - ORGANIZATIONS FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "ORGANIZATIONS_1", "ORGANIZATIONS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
+
+            //---CREATE - Groups--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "GROUPS", ScaffoldColumns));
+
+            //---FK - GROUPS FOREIGN KEYS 1--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GROUP_1", "GROUPS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - GROUPS FOREIGN KEY 2--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GROUPS_2", "GROUPS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
+
+
+            //---CREATE - USERS--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "USERS", ScaffoldColumns));
+
+
+
+            //---FK - USERS FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "USERS_1", "USERS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
+
+            //---CREATE - GROUPS & USERS--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "GROUPS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "GROUPS_USERS", ScaffoldColumns));
+
+            //---FK - GROUPS & USERS FOREIGN KEY 1--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GROUPS_USERS_1", "GROUPS_USERS", "Users", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - GROUPS & USERS FOREIGN KEY 2--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "GROUPS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GROUPS_USERS_2", "GROUPS_USERS", "GROUPS", ExistingColumnsList, ExistingColumnsList));
+
+            //---CREATE - STAGES
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "STAGES", ScaffoldColumns));
+
+
+
+            //---PK - STAGES Primary KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_PRIMARY_KEY(DB_PLATFORM, connAuth, "STAGES_1", "STAGES", ExistingColumnsList));
+
+            //---FK - STAGES FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            MetaColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "STAGES_1", "STAGES", "OBJECTS", ExistingColumnsList, MetaColumnsList));
+
+            //---FK - STAGES FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "STAGES_2", "STAGES", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - STAGES FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "STAGES_3", "STAGES", "USERS", ExistingColumnsList, ExistingColumnsList));
+
+            //---CREATE - Grips
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "GRIP_NAME", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "GRIPS", ScaffoldColumns));
+
+            //---PK - GRIPS Primary KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "GRIP_NAME", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_PRIMARY_KEY(DB_PLATFORM, connAuth, "GRIPS_1", "GRIPS", ExistingColumnsList));
+
+            //---FK - GRIPS FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIPS_1", "GRIPS", "STAGES", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - GRIPS FOREIGN KEY 2--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIPS_2", "GRIPS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - GRIPS FOREIGN KEY 2--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIPS_3", "GRIPS", "USERS", ExistingColumnsList, ExistingColumnsList));
+
+
+
+            //---CREATE - OBJECTS SETS
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "GRIP_NAME", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "OBJECT_SETS", ScaffoldColumns));
+
+            //---UK - OBJECTS SETS UNIQUE KEY 1---> 
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "GRIP_NAME", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_SETS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_UNIQUE_KEY(DB_PLATFORM, connAuth, "OBJECT_SETS_1", "OBJECT_SETS", ExistingColumnsList));
+
+            //---UK - OBJECTS SETS UNIQUE KEY 1---> 
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_SETS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_UNIQUE_KEY(DB_PLATFORM, connAuth, "OBJECT_SETS_2", "OBJECT_SETS", ExistingColumnsList));
+
+
+            //---FK - OBJECTS SETS FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJECT_SETS_1", "OBJECT_SETS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - OBJECTS_SETS FOREIGN KEY 2--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJECT_SET_2", "OBJECT_SETS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - OBJECTS_SETS FOREIGN KEY 3--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJECT_SETS_3", "OBJECT_SETS", "USERS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - OBJECTS_SETS FOREIGN KEY 4--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "GRIP_NAME", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJECT_SETS_5", "OBJECT_SETS", "GRIPS", ExistingColumnsList, ExistingColumnsList));
+
+
+
+            //---CREATE - OBJECT OPTION SETS
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_SETS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "Option_Value", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "OBJ_OPT_SETS", ScaffoldColumns));
+
+            //---FK OBJECT OPTION SETS FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_SETS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJECT_OPT_SETS_1", "OBJ_OPT_SETS", "OBJECT_SETS", ExistingColumnsList, ExistingColumnsList));
+
+            //---CREATE - Value Datatypes--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "VALUE_DATATYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "VALUE_DATATYPES", ScaffoldColumns));
+
+            //---UK VALUE DATATYPES Unique KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "VALUE_DATATYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_UNIQUE_KEY(DB_PLATFORM, connAuth, "VALUE_DATATYPES_1", "VALUE_DATATYPES", ExistingColumnsList));
+
+            //---CREATE - OBJECTS & PROPERTIES SETS--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_SETS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "VALUE_DATATYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "Property_Name", _DataType = "Characters(250)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "HAS_PARENT", _DataType = "Characters(5)", _DefaultValue = "true", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "HAS_CHILD", _DataType = "Characters(5)", _DefaultValue = "false", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "PARENT_OBJ_PROP_SETS_ID", _DataType = "Numbers", _DefaultValue = "0", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "PROPERTY_VALUE", _DataType = "Characters(250)", _DefaultValue = "", _IsNull = true });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "OBJ_PROP_SETS", ScaffoldColumns));
+
+            //---FK OBJECTS & PROPERTIES SETS FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_SETS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJ_PROP_SETS_1", "OBJ_PROP_SETS", "OBJECT_SETS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK OBJECTS & PROPERTIES SETS FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJ_PROP_SETS_2", "OBJ_PROP_SETS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK OBJECTS & PROPERTIES SETS FOREIGN KEY 2--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "VALUE_DATATYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJ_PROP_SETS_3", "OBJ_PROP_SETS", "VALUE_DATATYPES", ExistingColumnsList, ExistingColumnsList));
+
+
+            //---CREATE - OBJECTS PROPERTIES OPTIONS SETS--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJ_PROP_SETS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "Option_Value", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "OBJ_PROP_OPT_SETS", ScaffoldColumns));
+
+            //---FK OBJECTS PROPERTIES OPTIONS SETS FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJ_PROP_SETS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJ_PROP_OPT_SETS_1", "OBJ_PROP_OPT_SETS", "OBJ_PROP_SETS", ExistingColumnsList, ExistingColumnsList));
+
+            //---UK - OBJECTS SETS UNIQUE KEY 1---> 
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJ_PROP_SETS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "Option_Value", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_UNIQUE_KEY(DB_PLATFORM, connAuth, "OBJ_PROP_OPT_SETS_1", "OBJ_PROP_OPT_SETS", ExistingColumnsList));
+
+
+            //---CREATE - CORES--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "CORES", ScaffoldColumns));
+
+
+
+            //---FK - CORES FOREIGN KEY 1--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CORES_1", "CORES", "USERS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - CORES FOREIGN KEY 2--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CORES_2", "CORES", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - CORES FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CORES_3", "CORES", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
+
+
+            //---CREATE - APPLICATIONS--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "CORES_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "APPLICATIONS", ScaffoldColumns));
+
+
+
+            //---PK - APPLICATIONS PRIMARY KEY--->
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "Name", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_PRIMARY_KEY(DB_PLATFORM, connAuth, "APPLICATIONS", "APPLICATIONS", ScaffoldColumns));
+
+            //---FK - APPLICATIONS FOREIGN KEY 1--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "CORES_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            MetaColumnsList.Add(new ColumnStructure { _Name = "CORES_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "APPLICATIONS_1", "APPLICATIONS", "CORES", MetaColumnsList, ExistingColumnsList));
+
+            //---FK - APPLICATIONS FOREIGN KEY 2--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "APPLICATIONS_2", "APPLICATIONS", "USERS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - APPLICATIONS FOREIGN KEY 3--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "APPLICATIONS_3", "APPLICATIONS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - APPLICATIONS FOREIGN KEY 4--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "APPLICATIONS_4", "APPLICATIONS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
+
+            //---CREATE - ROLES--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "ROLES", ScaffoldColumns));
+
+            //---FK - ROLES FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "ROLES_1", "ROLES", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
+
+            //---CREATE - PRIVELEGES--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "PRIVELEGES", ScaffoldColumns));
+
+            //---FK - PRIVELEGES FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "PRIVELEGES_1", "PRIVELEGES", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
+
+            //---CREATE - ROLES & PRIVELEGES--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "ROLES_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "PRIVELEGES_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "ROLES_PRIVELEGES", ScaffoldColumns));
+
+            //---FK - ROLES & PRIVELEGES FOREIGN KEY 1--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "ROLES_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "ROLES_PRIVELEGES_1", "ROLES_PRIVELEGES", "ROLES", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - ROLES & PRIVELEGES FOREIGN KEY 2--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "PRIVELEGES_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "ROLES_PRIVELEGES_2", "ROLES_PRIVELEGES", "PRIVELEGES", ExistingColumnsList, ExistingColumnsList));
+
+            //---CREATE - USERS & ROLES & PRIVELEGES--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "ROLES_PRIVELEGES_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "USERS_ROLES_PRIVELEGES", ScaffoldColumns));
+
+            //---FK - USERS & ROLES & PRIVELEGES FOREIGN KEY 1--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "ROLES_PRIVELEGES_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "USERS_ROLES_PRIVELEGES_1", "USERS_ROLES_PRIVELEGES", "ROLES_PRIVELEGES", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - USERS &  ROLES & PRIVELEGES FOREIGN KEY 2--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "USERS_ROLES_PRIVELEGES_2", "USERS_ROLES_PRIVELEGES", "USERS", ExistingColumnsList, ExistingColumnsList));
+
+
+
+            //---CREATE - CASES--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "APPLICATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "CASES", ScaffoldColumns));
+
+
+
+            //---FK - CASES FOREIGN KEY 1--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "APPLICATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_1", "CASES", "APPLICATIONS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - CASES FOREIGN KEY 2--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_2", "CASES", "USERS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - CASES FOREIGN KEY 3--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_3", "CASES", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - CASES FOREIGN KEY 4--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_4", "CASES", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
+
+
+
+            //---CREATE - FORMS--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "Organizations_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "FORMS", ScaffoldColumns));
+
+            //---FK - FORMS FOREIGN KEY 1--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_1", "FORMS", "USERS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - FORMS FOREIGN KEY 2--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_2", "FORMS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - FORMS FOREIGN KEY 3--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_3", "FORMS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
+
+            //---CREATE - CASES & FORMS--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "CASES_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "FORMS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "CASES_FORMS", ScaffoldColumns));
+
+            //---FK - CASES & FORMS FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "CASES_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_FORMS_1", "CASES_FORMS", "CASES", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - CASES & FORMS FOREIGN KEY 2--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "FORMS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_FORMS_2", "CASES_FORMS", "FORMS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - CASES & FORMS FOREIGN KEY 3--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_FORMS_3", "CASES_FORMS", "USERS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - CASES & FORMS FOREIGN KEY 4--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "CASES_FORMS_4", "CASES_FORMS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
+
+
+            //---CREATE - FORMS & STAGES--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "FORMS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "FORMS_STAGES", ScaffoldColumns));
+
+            //---FK - FORMS & STAGES FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_STAGES_1", "FORMS_STAGES", "STAGES", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - FORMS & OBJECTS STAGES FOREIGN KEY 2--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "FORMS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_STAGES_2", "FORMS_STAGES", "FORMS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - FORMS & OBJECTS STAGES FOREIGN KEY 3--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_STAGES_3", "FORMS_STAGES", "USERS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - FORMS & OBJECTS STAGES FOREIGN KEY 4--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "FORMS_STAGES_4", "FORMS_STAGES", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
+
+            //---CREATE - GRIDS--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "Organizations_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "GRIDS", ScaffoldColumns));
+
+            //---FK - GRIDS FOREIGN KEY 1--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIDS_1", "GRIDS", "USERS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - GRIDS FOREIGN KEY 2--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIDS_2", "GRIDS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - GRIDS FOREIGN KEY 3--->
+            ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIDS_3", "GRIDS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
+
+            //---CREATE - GRIDS & FORM & STAGES--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "GRIDS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "FORMS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "GRIDS_FORMS_STAGES", ScaffoldColumns));
+
+            //---FK - GRIDS & FORMS FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "FORMS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIDS_FORMS_STAGES_1", "GRIDS_FORMS_STAGES", "FORMS", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - GRIDS & STAGES FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIDS_FORMS_STAGES_2", "GRIDS_FORMS_STAGES", "STAGES", ExistingColumnsList, ExistingColumnsList));
+
+            //---FK - GRIDS & FORMS FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "GRIDS_ID", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIDS_FORMS_STAGES_3", "GRIDS_FORMS_STAGES", "GRIDS", ExistingColumnsList, ExistingColumnsList));
+
+
+            Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "USERS"));
+            Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "STAGES"));
+            Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "GRIPS"));
+            Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "CORES"));
+            Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "APPLICATIONS"));
+            Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "CASES"));
+            Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "FORMS"));
                     
-                
-                    //---CREATE - GRIDS--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "Organizations_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "GRIDS", ScaffoldColumns));
-
-                    //---FK - GRIDS FOREIGN KEY 1--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIDS_1", "GRIDS", "USERS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - GRIDS FOREIGN KEY 2--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIDS_2", "GRIDS", "ORGANIZATIONS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - GRIDS FOREIGN KEY 3--->
-                    ScaffoldColumns.Clear(); ExistingColumnsList.Clear(); MetaColumnsList.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIDS_3", "GRIDS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---CREATE - GRIDS & FORM & STAGES--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "GRIDS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "FORMS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "ORGANIZATIONS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    ScaffoldColumns.Add(new ColumnStructure { _Name = "USERS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "GRIDS_FORMS_STAGES", ScaffoldColumns));
-
-                    //---FK - GRIDS & FORMS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "FORMS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIDS_FORMS_STAGES_1", "GRIDS_FORMS_STAGES", "FORMS", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - GRIDS & STAGES FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_TYPE", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "STAGE_NAME", _DataType = "Varchar(50)", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIDS_FORMS_STAGES_2", "GRIDS_FORMS_STAGES", "STAGES", ExistingColumnsList, ExistingColumnsList));
-
-                    //---FK - GRIDS & FORMS FOREIGN KEY 1--->
-                    ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
-                    ExistingColumnsList.Add(new ColumnStructure { _Name = "GRIDS_ID", _DataType = "integer", _DefaultValue = "", _IsNull = false });
-                    Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "GRIDS_FORMS_STAGES_3", "GRIDS_FORMS_STAGES", "GRIDS", ExistingColumnsList, ExistingColumnsList));
-
-
-
-                    Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "USERS"));
-                    Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "STAGES"));
-                    Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "GRIPS"));
-                    Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "CORES"));
-                    Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "APPLICATIONS"));
-                    Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "CASES"));
-                    Logger.AddRange(EP_ADD_DATA_SCAFFOLD(DB_PLATFORM, connAuth, "FORMS"));
-                    break;
-            }
-                    
+                  
             ////Application_ID, NAME
 
             //Logger.Add(EP_ADD_TABLE("Events"));  //Has Applications_ID
@@ -1444,6 +848,66 @@ namespace CMS.classes
             ////Workflow_ID
 
             return Logger;
+        }
+
+        public ArrayList EP_BUILD_DICTIONARY(string DB_PLATFORM, string connAuth, string SystemName)
+        {
+            ArrayList Logger = new ArrayList();
+
+            ArrayList columnlist = new ArrayList();
+
+            List<ColumnStructure> ScaffoldColumns = new List<ColumnStructure>();
+            List<ColumnStructure> ExistingColumnsList = new List<ColumnStructure>();
+            List<ColumnStructure> MetaColumnsList = new List<ColumnStructure>();
+
+            //---CREATE - OBJECT Layer--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_LAYER", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "OBJECT_LAYERS", ScaffoldColumns));
+
+            //---PK - OBJECT LAYERS Unique KEY--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_LAYER", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_PRIMARY_KEY(DB_PLATFORM, connAuth, "OBJECT_LAYERS_1", "OBJECT_LAYERS", ExistingColumnsList));
+
+            //---CREATE - OBJECTS--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_LAYER", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "OBJECTS", ScaffoldColumns));
+
+            //---PK - OBJECTS Unique KEY--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_PRIMARY_KEY(DB_PLATFORM, connAuth, "OBJECTS_1", "OBJECTS", ExistingColumnsList));
+
+            //---FK - OBJECT LAYERS FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_LAYER", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "OBJECTS_1", "OBJECTS", "OBJECT_LAYERS", ExistingColumnsList, ExistingColumnsList));
+
+            //---CREATE - LOGS--->
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Characters(50)", _DefaultValue = "", _IsNull = false });
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "Entry", _DataType = "Characters(4000)", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "LOGS", ScaffoldColumns));
+
+            //---FK - LOGS FOREIGN KEY 1--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "OBJECT_TYPE", _DataType = "Numbers", _DefaultValue = "", _IsNull = false });
+            Logger.Add(EP_ADD_FOREIGN_KEY(DB_PLATFORM, connAuth, "LOGS_1", "LOGS", "OBJECTS", ExistingColumnsList, ExistingColumnsList));
+
+            //----CREATE DICTIONARY EP TABLE --->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ScaffoldColumns.Add(new ColumnStructure { _Name = "TABLE_NAME", _DataType = "Varchar2(30)", _DefaultValue = "", _IsNull = false });
+            Logger.AddRange(EP_ADD_SCAFFOLD(DB_PLATFORM, connAuth, "EP_TABLES", ScaffoldColumns));
+
+            //---PK -DICTIONARY EP TABLE Unique KEY--->
+            ExistingColumnsList.Clear(); MetaColumnsList.Clear(); ScaffoldColumns.Clear();
+            ExistingColumnsList.Add(new ColumnStructure { _Name = "TABLE_NAME", _DataType = "Varchar2(30)", _DefaultValue = "", _IsNull = false});
+            Logger.Add(EP_ADD_PRIMARY_KEY(DB_PLATFORM, connAuth, "TABLE_NAME_1", "EP_TABLES", ExistingColumnsList));
+
+            return Logger;
+                
         }
 
         public ArrayList EP_BUILD_SYSTEM_VIEWS(string DB_PLATFORM, string connAuth, string SystemName)
@@ -1551,7 +1015,35 @@ namespace CMS.classes
             
             }
         }
-       
+
+        public string EP_ADD_Dictionary_Table(string DB_PLATFORM, string connAuth, string TableName)
+        {
+            List<DBParameters> EntryProcedureParameters = new List<DBParameters>();
+
+            EntryProcedureParameters.Add(new DBParameters
+            {
+                ParamName = "P_TABLE_NAME",
+                ParamDirection = ParameterDirection.Input,
+                OracleParamDataType = OracleDbType.Varchar2,
+                MSSqlParamDataType = SqlDbType.VarChar,
+                ParamSize = 30,
+                ParamValue = TableName
+            });
+
+            EntryProcedureParameters.Add(new DBParameters
+            {
+                ParamName = "R_EP_TABLES_ID",
+                ParamDirection = ParameterDirection.Output,
+                OracleParamDataType = OracleDbType.Int32,
+                MSSqlParamDataType = SqlDbType.Int,
+
+            });
+
+            return EP_ADD_ENTRY(DB_PLATFORM, connAuth, "EP_TABLES", EntryProcedureParameters);
+
+
+        }
+        
         public string EP_ADD_ENTRY_Organizations(string DB_PLATFORM, string connAuth)
         {
             List<DBParameters> EntryProcedureParameters = new List<DBParameters>();
@@ -3140,21 +2632,9 @@ namespace CMS.classes
             return Logger;
         }
 
-        public ArrayList SQL_DATA_DEFAULT(string DB_PLATFORM, string connAuth, string SystemName)
+        public ArrayList EP_LOAD_SYS_DATA(string DB_PLATFORM, string connAuth, string SystemName)
         {
             ArrayList Logger = new ArrayList();
-
-            string Organizations_ID;
-
-            string Users_ID; 
-
-            string Cores_ID;
-
-            string APP_ID;
-
-            string Cases_ID;
-
-            string Forms_ID, Stages_ID, GripsID, ObjectSetsID, ObjectPropertySetID, ObjectPropertyOptionSetID;
 
             Logger.Add(EP_ADD_ENTRY_Object_Layer(DB_PLATFORM, connAuth, "Front-End"));
             Logger.Add(EP_ADD_ENTRY_Object_Layer(DB_PLATFORM, connAuth, "Design"));
@@ -3170,11 +2650,21 @@ namespace CMS.classes
             Logger.Add(EP_ADD_ENTRY_Object_Layer(DB_PLATFORM, connAuth, "Universal"));
             Logger.Add(EP_ADD_ENTRY_Object_Layer(DB_PLATFORM, connAuth, "System"));
             Logger.Add(EP_ADD_ENTRY_Object_Layer(DB_PLATFORM, connAuth, "Grid"));
-            Logger.Add(EP_ADD_ENTRY_Object_Layer(DB_PLATFORM, connAuth, "IO Tags"));
+            Logger.Add(EP_ADD_ENTRY_Object_Layer(DB_PLATFORM, connAuth, "IO Tag"));
+            Logger.Add(EP_ADD_ENTRY_Object_Layer(DB_PLATFORM, connAuth, "Dictionary"));
+            Logger.Add(EP_ADD_ENTRY_Object_Layer(DB_PLATFORM, connAuth, "Table"));
 
             Logger.Add(EP_ADD_ENTRY_Value_Datatype(DB_PLATFORM, connAuth, "Characters"));
             Logger.Add(EP_ADD_ENTRY_Value_Datatype(DB_PLATFORM, connAuth, "Number"));
             Logger.Add(EP_ADD_ENTRY_Value_Datatype(DB_PLATFORM, connAuth, "Date"));
+
+            
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Table", "Dictionary"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Primary Keys", "Dictionary"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Foreign Keys", "Dictionary"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Unique Keys", "Dictionary"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Linkable Tables", "Dictionary"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Toolbox Modules", "Dictionary"));
 
             Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Core", "System"));
             Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Application", "System"));
@@ -3199,26 +2689,53 @@ namespace CMS.classes
             Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Demographic", "Application"));
             Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Conditional_Logic", "Application"));
 
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "ID", "IO Tags"));
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Value", "IO Tags"));
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Text_Box", "IO Tags"));
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Attribute", "IO Tags"));
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Paragraph_Text", "IO Tags"));
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Rich_Text", "IO Tags"));
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Check_Box", "IO Tags"));
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Radio_Button", "IO Tags"));
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Drop_Down", "IO Tags"));
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Section", "IO Tags"));
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Page_Break", "IO Tags"));
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Number", "IO Tags"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "ID", "IO Tag"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Value", "IO Tag"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Text_Box", "IO Tag"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Attribute", "IO Tag"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Paragraph_Text", "IO Tag"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Rich_Text", "IO Tag"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Check_Box", "IO Tag"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Radio_Button", "IO Tag"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Drop_Down", "IO Tag"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Section", "IO Tag"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Page_Break", "IO Tag"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Number", "IO Tag"));
 
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Email", "IO Tags"));
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Url", "IO Tags"));
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Date", "IO Tags"));
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Time", "IO Tags"));
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Phone", "IO Tags"));
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Credit_Card", "IO Tags"));
-            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "File_Upload", "IO Tags"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Email", "IO Tag"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Url", "IO Tag"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Date", "IO Tag"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Time", "IO Tag"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Phone", "IO Tag"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "Credit_Card", "IO Tag"));
+            Logger.Add(EP_ADD_ENTRY_Object(DB_PLATFORM, connAuth, "File_Upload", "IO Tag"));
+
+            return Logger;
+        }
+
+        public ArrayList EP_LOAD_TEST_DATA(string DB_PLATFORM, string connAuth, string SystemName)
+        {
+            ArrayList Logger = new ArrayList();
+
+            string Organizations_ID = "1000";
+
+            string Users_ID = "1000";
+
+            string Cores_ID = "1000";
+
+            string APP_ID = "1000";
+
+            string Cases_ID = "1000";
+
+            string Stages_ID = "1000";
+
+            string Forms_ID = "1000";
+
+            string GripsID = "1000";
+            string ObjectSetsID = "1000";
+            string ObjectPropertySetID = "1000";
+
+            string ObjectPropertyOptionSetID = "1000";
 
             Organizations_ID = EP_ADD_ENTRY_Organizations(DB_PLATFORM, connAuth);
             Users_ID = EP_ADD_ENTRY_Users(DB_PLATFORM, connAuth);
@@ -3325,9 +2842,9 @@ namespace CMS.classes
             ObjectPropertySetID = EP_ADD_ENTRY_Object_Property_Set(DB_PLATFORM, connAuth, ObjectSetsID, "Number", "Number", "Min", "false", "false", "", "1");
             ObjectPropertySetID = EP_ADD_ENTRY_Object_Property_Set(DB_PLATFORM, connAuth, ObjectSetsID, "Number", "Number", "Max", "false", "false", "", "10");
 
-            EP_ADD_ENTRY_OBJECT_DATA(DB_PLATFORM, connAuth, ObjectSetsID, "Forms", Forms_ID, "Characters", "alsjdhflakjsdhf"); 
+            EP_ADD_ENTRY_OBJECT_DATA(DB_PLATFORM, connAuth, ObjectSetsID, "Forms", Forms_ID, "Characters", "alsjdhflakjsdhf");
 
-           //SQL_ADD_ROW_Object_Data(DB_PLATFORM, connAuth, "FORMS", "Characters", "FORMS_ID", ObjectSetsID, "Test");
+            //SQL_ADD_ROW_Object_Data(DB_PLATFORM, connAuth, "FORMS", "Characters", "FORMS_ID", ObjectSetsID, "Test");
 
             Stages_ID = EP_ADD_ENTRY_Stage(DB_PLATFORM, connAuth, "Grid", "First Grid", Organizations_ID, Users_ID);
             GripsID = EP_ADD_ENTRY_Grip(DB_PLATFORM, connAuth, "Grid", "First Grid", "Grid Settings", Organizations_ID, Users_ID);
@@ -3338,36 +2855,6 @@ namespace CMS.classes
             ObjectPropertySetID = EP_ADD_ENTRY_Object_Property_Set(DB_PLATFORM, connAuth, ObjectSetsID, "Text_Box", "Characters", "data-sizex", "false", "false", "", "57");
             ObjectPropertySetID = EP_ADD_ENTRY_Object_Property_Set(DB_PLATFORM, connAuth, ObjectSetsID, "Text_Box", "Characters", "data-sizey", "false", "false", "", "4");
             ObjectPropertySetID = EP_ADD_ENTRY_Object_Property_Set(DB_PLATFORM, connAuth, ObjectSetsID, "Text_Box", "Characters", "class", "false", "false", "", "gs-w");
-
-
-            return Logger;
-        }
-
-        public ArrayList SQL_DATA_EXAMPLE(string DB_PLATFORM, string connAuth, string SystemName)
-        {
-            ArrayList Logger = new ArrayList();
-
-            string Organizations_ID = "1000";
-
-            string Users_ID = "1000";
-
-            string Cores_ID = "1000";
-
-            string APP_ID = "1000";
-
-            string Cases_ID = "1000";
-
-            string Stages_ID = "1000";
-
-            string Forms_ID = "1000";
-
-            string GripsID = "1000";
-            string ObjectSetsID = "1000";
-            string ObjectPropertySetID = "1000";
-
-            string ObjectPropertyOptionSetID = "1000";
-            
-            
 
             EP_ADD_ENTRY_OBJECT_DATA(DB_PLATFORM, connAuth, "1017", "Forms", Forms_ID, "Characters", "Example 101091");         
 
@@ -4602,6 +4089,9 @@ namespace CMS.classes
             
                 //Step 3 Create Trigger
                 triggerResult = EP_ADD_SEQUENCE_TRIGGER(DB_Platform, ConnAuth, Name, "Before", "INSERT", (Name + "_SQ"), (Name + "_ID"));
+
+                //Add Table Information to Dictionary
+                EP_ADD_Dictionary_Table(DB_Platform, ConnAuth, Name); 
 
                 if (tableresult.ToLower().Contains("err") || sequenceResult.ToLower().Contains("err") || triggerResult.ToLower().Contains("err"))
                 {
@@ -5969,7 +5459,7 @@ namespace CMS.classes
         {
             string tempColumn = column.ToLower(); //ExtractString(column, "", "(");
 
-            if (column.ToLower() == "characters" || column.ToLower().Contains("varchar"))
+            if (column.ToLower().Contains("characters") || column.ToLower().Contains("varchar"))
                 tempColumn = ExtractString(column, "", "(");
 
             switch(DB_Platform)
