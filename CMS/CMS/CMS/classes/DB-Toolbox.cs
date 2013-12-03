@@ -3885,7 +3885,8 @@ namespace CMS.classes
             //Initiate buffer for SQL syntax.
             StringBuilder sqlStatement = new StringBuilder();
             sqlStatement.Append("alter table " + TableName + " ");
-            sqlStatement.Append("add " + MaxNameLength(ColumnName, 30) + " " + ObjectType + " " + _DefaultValue + " " + _isNull);
+            string tempObjectType = EP_GET_DATATYPE(DB_PLATFORM, ObjectType);
+            sqlStatement.Append("add " + MaxNameLength(ColumnName, 30) + " " + tempObjectType + " " + _DefaultValue + " " + _isNull);
                 
             switch (DB_PLATFORM)
             {
@@ -3915,7 +3916,7 @@ namespace CMS.classes
 
                     foreach (ColumnStructure i in ColumnList)
                     {
-                        HoldResult.Add(EP_ADD_COLUMN(DB_PLATFORM, connAuth, TableName, i._Name, EP_GET_DATATYPE(DB_Platform, i._DataType), i._DefaultValue, i._IsNull));
+                        HoldResult.Add(EP_ADD_COLUMN(DB_PLATFORM, connAuth, TableName, i._Name, i._DataType, i._DefaultValue, i._IsNull));
                     }
                     break;
                 case "Microsoft":
@@ -5928,12 +5929,20 @@ namespace CMS.classes
         public string ExtractString(string s, string tag, string tag2)
         {
             // You should check for errors in real-world code, omitted for brevity
-            var startTag = tag;
-            int startIndex = s.IndexOf(startTag) + startTag.Length;
-            var startTag2 = tag2;
-            int startIndex2 = s.IndexOf(startTag2) - startTag.Length;
+            try
+            {
+                var startTag = tag;
+                int startIndex = s.IndexOf(startTag) + startTag.Length;
+                var startTag2 = tag2;
+                int startIndex2 = s.IndexOf(startTag2) - s.IndexOf(startTag);
 
-            return s.Substring(startIndex, startIndex2);
+                string temp = s.Substring(startIndex, startIndex2);
+                return s.Substring(startIndex, startIndex2);
+            }
+            catch (Exception e)
+            {
+                return e.ToString();
+            }
         }
 
         public string MaxNameLength(string name, int maxLength)
@@ -5956,44 +5965,66 @@ namespace CMS.classes
 
         //START TOOL UNIVERSAL 
         //
-        public string EP_GET_DATATYPE(string DB_Platform, string column )
+        public string EP_GET_DATATYPE(string DB_Platform, string column)
         {
-            string tempColumn = column;
+            string tempColumn = column.ToLower(); //ExtractString(column, "", "(");
+
+            if (column.ToLower() == "characters" || column.ToLower().Contains("varchar"))
+                tempColumn = ExtractString(column, "", "(");
 
             switch(DB_Platform)
             {
                 case "Oracle":
                 case "ORACLE":
 
-                    switch (tempColumn)
+                    switch (tempColumn.ToLower())
                     {
-                        case "Characters":
-                            break;
-                        case "Numbers":
-                            break;
-                        case "Dates":
-                            break;
-                        case "Times":
-                            break;
+                        case "characters":
+                        case "varchar2":
+                        case "varchar":     
+                            return "varchar2(" + ExtractString(column, "(", ")");
+                        case "numbers":
+                        case "number":
+                        case "integer":
+                        case "numbs":
+                        case "int":
+                        case "ints":
+                            return "number";
+                        case "dates":
+                        case "date":
+                            return "date";
+                        case "times":
+                        case "timestamp":
+                            return "timestamp";
+                        default:
+                            return "Invalid Column Type";
                     }
 
-                    return column;
                 case "Microsoft":
                 case "MICROSOFT":
 
-                    switch (tempColumn)
+                    switch (tempColumn.ToLower())
                     {
-                        case "Characters":
-                            break;
-                        case "Numbers":
-                            break;
-                        case "Dates":
-                            break;
-                        case "Times":
-                            break;
+                        case "characters":
+                        case "varchar2":
+                        case "varchar":
+                            return "varchar(" + ExtractString(column, "(", ")");
+                        case "numbers":
+                        case "integer":
+                        case "numbs":
+                        case "int":
+                        case "ints":
+                            return "integer";
+                        case "dates":
+                        case "date":
+                            return "datetime";
+                        case "times":
+                        case "timestamp":
+                            return "timestamp";
+                        default:
+                            return "Invalid Column Type";
                     }
 
-                    return column;
                 default:
                     return "Invalid DB Platform";
             }
